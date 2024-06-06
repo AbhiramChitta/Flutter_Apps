@@ -1,7 +1,7 @@
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/Quotes.dart';
+
 
 const List<String> options = ['Open', 'Order Created', 'Cancelled'];
 
@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: CupertinoTextFormFieldRow(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      placeholder: 'Email',
+                      placeholder: 'Username',
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: const BoxDecoration(
                         border: Border(
@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   CupertinoButton.filled(
                     onPressed: _login,
-                    child: Text('Login'),
+                    child: const Text('Login'),
                   ),
                 ],
               ),
@@ -219,32 +219,72 @@ class Home extends StatelessWidget {
   }
 }
 
-class SecondPage extends StatelessWidget {
-  SecondPage({super.key});
-  static List<String> quotation = ['DQ20240001','DQ20240002','DQ20240003','DQ20240004','DQ20240005',
-    'DQ20240006','DQ20240007','DQ20240008','DQ20240009'];
+enum QuoteStatus { open, orderCreated, cancelled }
 
-  final List<Quotes> quote_data = List.generate(quotation.length, (index)=> Quotes('${quotation[index]}'));
+extension QuoteStatusExtension on QuoteStatus {
+  String get name {
+    switch (this) {
+      case QuoteStatus.open:
+        return 'Open';
+      case QuoteStatus.orderCreated:
+        return 'Order Created';
+      case QuoteStatus.cancelled:
+        return 'Cancelled';
+      default:
+        return '';
+    }
+  }
+}
+
+class Quotes {
+  final String name;
+  QuoteStatus status;
+
+  Quotes(this.name, {this.status = QuoteStatus.open});
+}
+
+class SecondPage extends StatefulWidget {
+  SecondPage({super.key});
+  static List<String> quotation = [
+    'DQ20240001', 'DQ20240002', 'DQ20240003', 'DQ20240004', 'DQ20240005',
+    'DQ20240006', 'DQ20240007', 'DQ20240008', 'DQ20240009'
+  ];
+
+  @override
+  _SecondPageState createState() => _SecondPageState();
+}
+
+class _SecondPageState extends State<SecondPage> {
+  final List<Quotes> quote_data = List.generate(
+      SecondPage.quotation.length,
+          (index) => Quotes(SecondPage.quotation[index])
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         title: const Text('Quotations'),
         centerTitle: true,
         backgroundColor: Colors.white,
       ),
       body: ListView.builder(
           itemCount: quote_data.length,
-          itemBuilder: (context,index)
-          {
+          itemBuilder: (context, index) {
             return Card(
-              child: ListTile(
+              child: ExpansionTile(
                 title: Text(quote_data[index].name),
-                onTap: (){
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                      ThirdPage(quotes: quote_data[index])));
-                },
+                subtitle: Text("Status: ${quote_data[index].status.name}"),
+                children: QuoteStatus.values.map((QuoteStatus status) {
+                  return ListTile(
+                    title: Text(status.name),
+                    onTap: () {
+                      setState(() {
+                        quote_data[index].status = status;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             );
           }
@@ -252,8 +292,6 @@ class SecondPage extends StatelessWidget {
     );
   }
 }
-
-
 
 class ThirdPage extends StatefulWidget {
   const ThirdPage({super.key, required this.quotes});
