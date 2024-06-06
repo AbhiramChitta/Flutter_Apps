@@ -1,12 +1,139 @@
 //import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/Quotes.dart';
 
+const List<String> options = ['Open', 'Order Created', 'Cancelled'];
+
 void main() {
   runApp(const MaterialApp(
-    home: Home(),
+    home: LoginPage(),
   ));
 }
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  // Dummy credentials
+  final String correctEmail = "admin";
+  final String correctPassword = "admin";
+
+  void _login() {
+    if (_formKey.currentState!.validate()) {
+      if (_emailController.text == correctEmail && _passwordController.text == correctPassword) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Error'),
+            content: const Text('Incorrect email or password.'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SizedBox.expand(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              "Login",
+              style: TextStyle(
+                fontSize: 35,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CupertinoTextFormFieldRow(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      placeholder: 'Email',
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: CupertinoColors.separator,
+                            width: 0.0,
+                          ),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CupertinoTextFormFieldRow(
+                      controller: _passwordController,
+                      obscureText: true,
+                      placeholder: 'Password',
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: CupertinoColors.separator,
+                            width: 0.0,
+                          ),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  CupertinoButton.filled(
+                    onPressed: _login,
+                    child: Text('Login'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -97,7 +224,7 @@ class SecondPage extends StatelessWidget {
   static List<String> quotation = ['DQ20240001','DQ20240002','DQ20240003','DQ20240004','DQ20240005',
     'DQ20240006','DQ20240007','DQ20240008','DQ20240009'];
 
-  final List<Quotes> quotedata = List.generate(quotation.length, (index)=> Quotes('${quotation[index]}'));
+  final List<Quotes> quote_data = List.generate(quotation.length, (index)=> Quotes('${quotation[index]}'));
 
   @override
   Widget build(BuildContext context) {
@@ -108,15 +235,15 @@ class SecondPage extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: ListView.builder(
-          itemCount: quotedata.length,
+          itemCount: quote_data.length,
           itemBuilder: (context,index)
           {
             return Card(
               child: ListTile(
-                title: Text(quotedata[index].name),
+                title: Text(quote_data[index].name),
                 onTap: (){
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                      ThirdPage(quotes: quotedata[index])));
+                      ThirdPage(quotes: quote_data[index])));
                 },
               ),
             );
@@ -126,14 +253,14 @@ class SecondPage extends StatelessWidget {
   }
 }
 
-const List<String> options = ['Open', 'Order Created', 'Cancelled'];
+
 
 class ThirdPage extends StatefulWidget {
-  ThirdPage({super.key, required this.quotes});
+  const ThirdPage({super.key, required this.quotes});
   final Quotes quotes;
 
   @override
-  _ThirdPageState createState() => _ThirdPageState();
+  State<ThirdPage> createState() => _ThirdPageState();
 }
 
 class _ThirdPageState extends State<ThirdPage> {
@@ -171,3 +298,26 @@ class _ThirdPageState extends State<ThirdPage> {
   }
 }
 
+class LoginService{
+  String username = '';
+  LoginService(this.username);
+  void getMyRecords(){}
+}
+
+class QuotationsService{
+  String username = '';
+  QuotationsService(this.username);
+  void getMyRecords(){}
+}
+
+class OrderService{
+  String username = '';
+  OrderService(this.username);
+  void getMyRecords(){}
+}
+
+class JobCardService{
+  String username = '';
+  JobCardService(this.username);
+  void getMyRecords(){}
+}
