@@ -135,6 +135,11 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 
+List<Quotes> quoteData = List.generate(
+    SecondPage.quotation.length,
+        (index) => Quotes(SecondPage.quotation[index])
+);
+
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -146,78 +151,61 @@ class Home extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.white,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Dashboard',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 35,
-              ),
+      body: Column(
+        children: <Widget>[
+          const SizedBox(height: 50),
+          const Text(
+            'Dashboard',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 35,
             ),
-            Container(
-              margin: const EdgeInsets.all(25),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(25),
+              children: [
+                Card(
+                  child: ListTile(
+                    title: const Text('Quotations', style: TextStyle(fontSize: 20)),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondPage()));
+                    },
+                  ),
                 ),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> SecondPage()));
-                },
-                child: const Text(
-                  'Quotations',
-                  style: TextStyle(fontSize: 20.0),
+                Card(
+                  child: ListTile(
+                    title: const Text('Orders', style: TextStyle(fontSize: 20)),
+                    onTap: () {
+                      // Handle the Orders action
+                    },
+                  ),
                 ),
-              ),
+                Card(
+                  child: ListTile(
+                    title: const Text('Job Cards', style: TextStyle(fontSize: 20)),
+                    onTap: () {
+                      // Handle the Job Cards action
+                    },
+                  ),
+                ),
+                Card(
+                  child: ListTile(
+                    title: const Text('Expenses', style: TextStyle(fontSize: 20)),
+                    onTap: () {
+                      // Handle the Expenses action
+                    },
+                  ),
+                ),
+              ],
             ),
-            Container(
-              margin: const EdgeInsets.all(25),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                ),
-                onPressed: () {
-                  // Handle the login action
-                },
-                child: const Text(
-                  'Orders',
-                  style: TextStyle(fontSize: 20.0),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(25),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                ),
-                onPressed: () {
-                  // Handle the login action
-                },
-                child: const Text(
-                  'Job Cards',
-                  style: TextStyle(fontSize: 20.0),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(25),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                ),
-                onPressed: () {
-                },
-                child: const Text(
-                  'Expenses',
-                  style: TextStyle(fontSize: 20.0),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
+
 
 enum QuoteStatus { open, orderCreated, cancelled }
 
@@ -244,22 +232,17 @@ class Quotes {
 }
 
 class SecondPage extends StatefulWidget {
-  SecondPage({super.key});
+  const SecondPage({super.key});
   static List<String> quotation = [
     'DQ20240001', 'DQ20240002', 'DQ20240003', 'DQ20240004', 'DQ20240005',
     'DQ20240006', 'DQ20240007', 'DQ20240008', 'DQ20240009'
   ];
 
   @override
-  _SecondPageState createState() => _SecondPageState();
+  State<SecondPage> createState() => _SecondPageState();
 }
 
 class _SecondPageState extends State<SecondPage> {
-  final List<Quotes> quote_data = List.generate(
-      SecondPage.quotation.length,
-          (index) => Quotes(SecondPage.quotation[index])
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -269,18 +252,18 @@ class _SecondPageState extends State<SecondPage> {
         backgroundColor: Colors.white,
       ),
       body: ListView.builder(
-          itemCount: quote_data.length,
+          itemCount: quoteData.length,
           itemBuilder: (context, index) {
             return Card(
               child: ExpansionTile(
-                title: Text(quote_data[index].name),
-                subtitle: Text("Status: ${quote_data[index].status.name}"),
+                title: Text(quoteData[index].name),
+                subtitle: Text("Status: ${quoteData[index].status.name}"),
                 children: QuoteStatus.values.map((QuoteStatus status) {
                   return ListTile(
                     title: Text(status.name),
                     onTap: () {
                       setState(() {
-                        quote_data[index].status = status;
+                        quoteData[index].status = status;
                       });
                     },
                   );
@@ -292,50 +275,6 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 }
-
-class ThirdPage extends StatefulWidget {
-  const ThirdPage({super.key, required this.quotes});
-  final Quotes quotes;
-
-  @override
-  State<ThirdPage> createState() => _ThirdPageState();
-}
-
-class _ThirdPageState extends State<ThirdPage> {
-  String currentoption = options[0];
-
-  //static get options => null;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.quotes.name),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            for (var option in options)
-              ListTile(
-                title: Text(option),
-                leading: Radio<String>(
-                  value: option,
-                  groupValue: currentoption,
-                  onChanged: (value) {
-                    setState(() {
-                      currentoption = value!;
-                    });
-                  },
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class LoginService{
   String username = '';
   LoginService(this.username);
